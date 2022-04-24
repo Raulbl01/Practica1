@@ -39,6 +39,15 @@ def get_data(lst_val, lst_res, empty, mutex):
     finally:
         mutex.release()
 
+def is_the_end(lst_val, mutex):
+    mutex.acquire()
+    products = True
+    i = 0
+    while products and i < len(lst_val):
+        products = products and lst_val[i] == -1
+        i = i + 1
+    mutex.release()
+    return products
 
 
 def producer(lst_val, empty, non_empty, mutex):
@@ -65,7 +74,7 @@ def merge(lst_val, lst_res, empty, non_empty, mutex):
     # Si ya han acabado, vamos a consumir, alternando (CONS-PROD)
     # Hay que consumir los N*NPROD productos
     print(f"{[x for x in lst_val]}")
-    for v in range(N*NPROD):
+    while not is_the_end(lst_val, mutex):
         #print (f"merge {current_process().name} consumiendo")
         delay(6)
         get_data(lst_val, lst_res, empty, mutex)
